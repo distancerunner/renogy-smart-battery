@@ -163,7 +163,7 @@
                     try {
                         const packet = event.target.value;
                         const payload = new DataView(packet.buffer, 3);
-                        // console.log('payload', payload);
+                        console.log('payload', payload);
 
                         if(requestType === 'getTemps') {
                             let numSensors = payload.getUint16(0);
@@ -182,7 +182,8 @@
                             let volt = payload.getUint16(2) / 10;
                             let chargeLevel = payload.getUint32(4) / 1000;
                             let capacity = payload.getUint32(8) / 1000;
-
+                            let nominalVoltage = 12.8;
+                            
                             const maxCurrent = Math.max(...currentArray);
                             const minCurrent = Math.min(...currentArray);
 
@@ -209,13 +210,14 @@
                             $vf.value = volt + ' / ' + currentAvg;
                             // $cf.value = currentAvg;
                             let chargePercent = (chargeLevel / capacity) * 100;
+                            let capacityWatthours = chargePercent*nominalVoltage
+
                             $lf.value = fmt.format(chargePercent) + "% (" + chargeLevel + "/" + capacity + ")";
                             $sf.value = state;
                             $wf.value = fmt.format((currentAvg * volt).toFixed(2));
 
                             elem.style.width = fmt.format(chargePercent) + "%";
-                            elem.innerHTML = fmt.format(chargePercent) + "%";
-
+                            elem.innerHTML = fmt.format(chargePercent) + "% (" + capacityWatthours.toFixed(0) + " Wh)";
 
                             // create a timestamp, update on every new poll to store the last infos
                             // let timestamp = Date.now();
