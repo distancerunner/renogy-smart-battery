@@ -182,7 +182,8 @@
                             let volt = payload.getUint16(2) / 10;
                             let chargeLevel = payload.getUint32(4) / 1000;
                             let capacity = payload.getUint32(8) / 1000;
-
+                            let nominalVoltage = 12.8;
+                            
                             const maxCurrent = Math.max(...currentArray);
                             const minCurrent = Math.min(...currentArray);
 
@@ -209,11 +210,12 @@
                             $vf.value = volt + ' / ' + currentAvg;
                             // $cf.value = currentAvg;
                             $lf.value = fmt.format((chargeLevel / capacity) * 100) + "% (" + chargeLevel + "/" + capacity + ")";
+                            let capacityWatthours = ((chargeLevel / capacity) * 100)*nominalVoltage
                             $sf.value = state;
                             $wf.value = fmt.format((currentAvg * volt).toFixed(0));
 
                             elem.style.width = chargeLevel + "%";
-                            elem.innerHTML = chargeLevel + "%";
+                            elem.innerHTML = chargeLevel + "% (" + capacityWatthours.toFixed(0) + " Wh )";
 
 
                             // create a timestamp, update on every new poll to store the last infos
