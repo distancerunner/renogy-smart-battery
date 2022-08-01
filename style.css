@@ -1,0 +1,42 @@
+body {
+    background-color: #484848;
+}
+
+h1 {
+    color: white;
+    text-align: center;
+    font-weight: bold;
+}
+
+.text-contrast {
+    color: white;
+}
+
+.form-control:disabled, .form-control[readonly] {
+    background-color: #fff;
+    opacity: 1;
+}
+.input-group-text {
+    width: 160px;
+}
+.timestamp {
+    font-size: 0.8em;
+}
+#myProgress {
+    background-color: white;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+#myProgress > span {
+    padding: 5px;
+}
+
+#myBar {
+    width: 0%;
+    padding: 10px;
+    background-color: #04AA6D;
+    text-align: center; /* To center it horizontally (if you want) */
+    color: white;
+    border-radius: 0px 0px 0px 5px;
+}

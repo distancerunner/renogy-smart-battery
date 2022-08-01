@@ -2,3 +2,6 @@ CACHE MANIFEST
 #Version 0.1
 
 index.html
+style.css
+bootstrap.min.css
+bootstrap.bundle.min.js
