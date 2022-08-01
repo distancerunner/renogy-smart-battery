@@ -3,7 +3,7 @@
 <!-- <html lang="en"> -->
 <html lang="en" manifest="appcache.manifest">
 <!-- <link rel="manifest" href="manifest.json"> -->
-  <head>
+    <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -13,317 +13,315 @@
     <link href="style.css" rel="stylesheet">
 
     <title>Renogy Battery Status</title>
-    <style>
-        
-    </style>
-  </head>
-  <body>
-    <div class="container">
-        <h1>Renogy Battery Status</h1>
-        
-        <div id="battery-connect-container" class="container" style="padding-bottom: 20px">
-            <button id="battery-connect" class="btn btn-primary">Connect</button>
-            <div class="text-contrast">(Chrome only)</div>
-        </div>
+    <script type="text/javascript" src="register-service-worker.js"></script>
+    </head>
+    <body>
         <div class="container">
-            <div id="myProgress">
-                <span>Charge Level</span>
-                <div id="myBar">-</div>
-            </div>
+            <h1>Renogy Battery Status</h1>
             
-            <div class="input-group mb-3">
-                <span class="input-group-text" id="watts">Watts</span>
-                <input type="text" class="form-control" id="watts-form" aria-describedby="watts" disabled="true">
+            <div id="battery-connect-container" class="container" style="padding-bottom: 20px">
+                <button id="battery-connect" class="btn btn-primary">Connect</button>
+                <div class="text-contrast">(Chrome only)</div>
             </div>
-            <div class="input-group mb-3">
-                <span class="input-group-text" id="state">Charge State</span>
-                <input type="text" class="form-control" id="state-form" aria-describedby="state" disabled="true">
-            </div>
-            <div class="input-group mb-3">
-                <span class="input-group-text" id="temperatures">Temperatures</span>
-                <input type="text" class="form-control" id="temperatures-form" aria-describedby="temperatures" disabled="true">
-            </div>
-            <div class="input-group mb-3">
-                <span class="input-group-text" id="volt">Volt/Current</span>
-                <input type="text" class="form-control" id="volt-form" aria-describedby="volt" disabled="true">
-            </div>
-            <div class="input-group mb-3">
-                <span class="input-group-text" id="level">Charge Level</span>
-                <input type="text" class="form-control" id="level-form" aria-describedby="level" disabled="true">
-            </div>
-            <div class="input-group mb-3">
-                <span class="input-group-text" id="cellvolts">Cell Volts</span>
-                <input type="text" class="form-control" id="cellvolts-form" aria-describedby="cellvolts" disabled="true">
-            </div>
-            <div class="alert alert-primary" role="alert" id="msgalert" style="display: none"></div>
+            <div class="container">
+                <div id="myProgress">
+                    <span>Charge Level</span>
+                    <div id="myBar">-</div>
+                </div>
+                
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="watts">Watts</span>
+                    <input type="text" class="form-control" id="watts-form" aria-describedby="watts" disabled="true">
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="state">Charge State</span>
+                    <input type="text" class="form-control" id="state-form" aria-describedby="state" disabled="true">
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="temperatures">Temperatures</span>
+                    <input type="text" class="form-control" id="temperatures-form" aria-describedby="temperatures" disabled="true">
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="volt">Volt/Current</span>
+                    <input type="text" class="form-control" id="volt-form" aria-describedby="volt" disabled="true">
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="level">Charge Level</span>
+                    <input type="text" class="form-control" id="level-form" aria-describedby="level" disabled="true">
+                </div>
+                <div class="input-group mb-3">
+                    <span class="input-group-text" id="cellvolts">Cell Volts</span>
+                    <input type="text" class="form-control" id="cellvolts-form" aria-describedby="cellvolts" disabled="true">
+                </div>
+                <div class="alert alert-primary" role="alert" id="msgalert" style="display: none"></div>
 
-            <div id="listContainer"></div>
+                <div id="listContainer"></div>
+            </div>
         </div>
-    </div>
-    <script src="bootstrap.bundle.min.js"></script>
-    <script>
-        function timeout(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
+        <script src="bootstrap.bundle.min.js"></script>
+        <script>
+            function timeout(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
 
-        const fmt = new Intl.NumberFormat('en-US', { maximumSignificantDigits: 4 });
-        let currentArray = [];
-        let statisticsArray = JSON.parse(localStorage.getItem('statisticsArray'));
-        if (!statisticsArray) {
-            statisticsArray = [];
-        }
+            const fmt = new Intl.NumberFormat('en-US', { maximumSignificantDigits: 4 });
+            let currentArray = [];
+            let statisticsArray = JSON.parse(localStorage.getItem('statisticsArray'));
+            if (!statisticsArray) {
+                statisticsArray = [];
+            }
 
-        let date = Date.now();
+            let date = Date.now();
 
-        let $bcc = document.getElementById('battery-connect-container');
-        let $bc = document.getElementById('battery-connect');
-        let $tf = document.getElementById('temperatures-form');
-        // let $tfC = document.getElementById('temperaturesC-form');
-        let $vf = document.getElementById('volt-form');
-        let $cf = document.getElementById('current-form');
-        let $lf = document.getElementById('level-form');
-        let $cvf = document.getElementById('cellvolts-form');
-        let $sf = document.getElementById('state-form');
-        let $wf = document.getElementById('watts-form');
-        let $msg = document.getElementById('msgalert');
-        let elem = document.getElementById("myBar");
-        let width = 1;
+            let $bcc = document.getElementById('battery-connect-container');
+            let $bc = document.getElementById('battery-connect');
+            let $tf = document.getElementById('temperatures-form');
+            // let $tfC = document.getElementById('temperaturesC-form');
+            let $vf = document.getElementById('volt-form');
+            let $cf = document.getElementById('current-form');
+            let $lf = document.getElementById('level-form');
+            let $cvf = document.getElementById('cellvolts-form');
+            let $sf = document.getElementById('state-form');
+            let $wf = document.getElementById('watts-form');
+            let $msg = document.getElementById('msgalert');
+            let elem = document.getElementById("myBar");
+            let width = 1;
 
-        function getTimestamp (time) {
-        const pad = (n,s=2) => (`${new Array(s).fill(0)}${n}`).slice(-s);
-        const d = new Date(time);
-        
-        return `${pad(d.getFullYear(),4)}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
-        }
-        
-        $bc.onclick = (e) => {
-            e.preventDefault();
+            function getTimestamp (time) {
+            const pad = (n,s=2) => (`${new Array(s).fill(0)}${n}`).slice(-s);
+            const d = new Date(time);
             
-            (async function() {
-                let device;
-                if(navigator.userAgent.toLowerCase().includes('bluefy')) {
-                    device = await navigator.bluetooth.requestDevice({
-                        filters: [{services: [0xFFD0]}]
-                    });
-                } else {
-                    device = await navigator.bluetooth.requestDevice({
-                        filters: [{services: [0xFFD0]}],
-                        optionalServices: [0xFFF0]
-                    });
-                }
-                let server = await device.gatt.connect();
-
-                let rxService = await server.getPrimaryService(0xFFD0);
-                let rxCharacteristic = await rxService.getCharacteristic(0xFFD1);
-
-                let txService = await server.getPrimaryService(0xFFF0);
-                let txCharacteristic = await txService.getCharacteristic(0xFFF1);
-                await txCharacteristic.startNotifications();
-
-                let requestType = '';
-                txCharacteristic.addEventListener('characteristicvaluechanged', (event) => {
-                    try {
-                        const packet = event.target.value;
-                        const payload = new DataView(packet.buffer, 3);
-                        console.log('payload', payload);
-
-                        if(requestType === 'getTemps') {
-                            let numSensors = payload.getUint16(0);
-                            let temps = [];
-                            let tempsC = [];
-                            for(let x=1; x <= numSensors; x++) {
-                                // console.log('sensors', payload.getInt16(x*2));
-                                let tempF = (payload.getInt16(x*2) / 10) * (9/5) + 32;
-                                let tempC = (payload.getInt16(x*2) / 10);
-                                temps.push(fmt.format(tempF));
-                                tempsC.push(fmt.format(tempC));
-                            }
-                            $tf.value = tempsC.join(', ') + ' °C / ' + temps.join(', ') + ' °F';
-                        } else if(requestType === 'getLevels') {
-                            let current = payload.getInt16(0) / 100;
-                            let volt = payload.getUint16(2) / 10;
-                            let chargeLevel = payload.getUint32(4) / 1000;
-                            let capacity = payload.getUint32(8) / 1000;
-                            let nominalVoltage = 12.8;
-                            
-                            const maxCurrent = Math.max(...currentArray);
-                            const minCurrent = Math.min(...currentArray);
-
-                            // if there is an abruptly current change, we need to adapt average values faster
-                            if (maxCurrent - minCurrent >= 3) {
-                              currentArray.splice(0,7);
-                            }
-
-                            // create current Array for smooth out charge state estimation
-                            currentArray.push(current);
-                            if ( currentArray.length > 10 ) {
-                                currentArray.shift();
-                            }
-                            const currentSum = currentArray.reduce((a, b) => a + b, 0);
-                            const currentAvg = (currentSum / currentArray.length).toFixed(2) || 0;
-
-                            let state = '-';
-                            if(current > 0) {
-                                state = fmt.format(Math.abs((capacity - chargeLevel) / currentAvg).toFixed(2)) + " hours till charged";
-                            } else if(current < 0) {
-                                state = fmt.format(Math.abs(chargeLevel / currentAvg).toFixed(2)) + " hours till depleted";
-                            }
-
-                            $vf.value = volt + ' / ' + currentAvg;
-                            // $cf.value = currentAvg;
-                            let chargePercent = (chargeLevel / capacity) * 100;
-                            let capacityWatthours = chargePercent*nominalVoltage
-
-                            $lf.value = fmt.format(chargePercent) + "% (" + chargeLevel + "/" + capacity + ")";
-                            $sf.value = state;
-                            $wf.value = fmt.format((currentAvg * volt).toFixed(2));
-
-                            elem.style.width = fmt.format(chargePercent) + "%";
-                            elem.innerHTML = fmt.format(chargePercent) + "% (" + capacityWatthours.toFixed(0) + " Wh)";
-
-                            // create a timestamp, update on every new poll to store the last infos
-                            // let timestamp = Date.now();
-                            let timestamp = new Date;
-
-                            // create uID to store only the last value per day
-                            uniqueTimeID = '' + timestamp.getFullYear() + (timestamp.getMonth()+1) + (timestamp.getDate()) + '';
-
-                            manipulateEntry = statisticsArray.filter(element => element.uniqueTimeID === uniqueTimeID);
-
-                            if ( manipulateEntry.length === 0 ) {
-                                // create new item per day if nothing exist
-                                statisticsArray.push({ uniqueTimeID: uniqueTimeID, time: timestamp, 
-                                    chargeLevel: fmt.format(chargePercent), 
-                                    volt: volt, 
-                                    currentAvg: currentAvg, 
-                                });
-                            } else {
-                                // manipulate the existing entry per day
-                                manipulateEntry[0].time = timestamp;
-                                manipulateEntry[0].chargeLevel = fmt.format(chargePercent);
-                                manipulateEntry[0].volt = volt;
-                                manipulateEntry[0].currentAvg = currentAvg;
-                            }
-
-                            // cut array after 30 days
-                            if ( statisticsArray.length > 30 ) {
-                                statisticsArray.shift();
-                            }
-
-                            localStorage.setItem('statisticsArray', JSON.stringify(statisticsArray));
-
-                            var strList = '<ul class="list-group">'
-                            strList += '<li class="list-group-item active"> On phone stored statistics (max.30 days)</li>';
-
-                            statisticsArray.forEach(function(element) {
-                                strList += '<li class="list-group-item"><span class="timestamp">'+ getTimestamp (element.time) + '</span><br>' + element.chargeLevel + '% (' + element.volt + 'V / ' + element.currentAvg + 'A)</li>';
-                            }); 
-
-                            strList += '</ul>';
-                            document.getElementById("listContainer").innerHTML = strList;
-
-                            // console.log('chargeLevel', chargeLevel);
-                            // console.log('capacity', capacity);
-                        } else if(requestType === 'getCellVolts') {
-                            let numCells = payload.getUint16(0);
-                            let volts = [];
-                            for(let x=1; x <= numCells; x++) {
-                                let volt = payload.getUint16(x*2) / 10;
-                                volts.push(volt);
-                            }
-                            $cvf.value = volts.join(', ');
-                        }
-                    } catch (error) {
-                        console.error(error);
+            return `${pad(d.getFullYear(),4)}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+            }
+            
+            $bc.onclick = (e) => {
+                e.preventDefault();
+                
+                (async function() {
+                    let device;
+                    if(navigator.userAgent.toLowerCase().includes('bluefy')) {
+                        device = await navigator.bluetooth.requestDevice({
+                            filters: [{services: [0xFFD0]}]
+                        });
+                    } else {
+                        device = await navigator.bluetooth.requestDevice({
+                            filters: [{services: [0xFFD0]}],
+                            optionalServices: [0xFFF0]
+                        });
                     }
+                    let server = await device.gatt.connect();
 
-                    requestType = '';
-                });
+                    let rxService = await server.getPrimaryService(0xFFD0);
+                    let rxCharacteristic = await rxService.getCharacteristic(0xFFD1);
 
-                let requestReady = async function() {
+                    let txService = await server.getPrimaryService(0xFFF0);
+                    let txCharacteristic = await txService.getCharacteristic(0xFFF1);
+                    await txCharacteristic.startNotifications();
+
+                    let requestType = '';
+                    txCharacteristic.addEventListener('characteristicvaluechanged', (event) => {
+                        try {
+                            const packet = event.target.value;
+                            const payload = new DataView(packet.buffer, 3);
+                            console.log('payload', payload);
+
+                            if(requestType === 'getTemps') {
+                                let numSensors = payload.getUint16(0);
+                                let temps = [];
+                                let tempsC = [];
+                                for(let x=1; x <= numSensors; x++) {
+                                    // console.log('sensors', payload.getInt16(x*2));
+                                    let tempF = (payload.getInt16(x*2) / 10) * (9/5) + 32;
+                                    let tempC = (payload.getInt16(x*2) / 10);
+                                    temps.push(fmt.format(tempF));
+                                    tempsC.push(fmt.format(tempC));
+                                }
+                                $tf.value = tempsC.join(', ') + ' °C / ' + temps.join(', ') + ' °F';
+                            } else if(requestType === 'getLevels') {
+                                let current = payload.getInt16(0) / 100;
+                                let volt = payload.getUint16(2) / 10;
+                                let chargeLevel = payload.getUint32(4) / 1000;
+                                let capacity = payload.getUint32(8) / 1000;
+                                let nominalVoltage = 12.8;
+                                
+                                const maxCurrent = Math.max(...currentArray);
+                                const minCurrent = Math.min(...currentArray);
+
+                                // if there is an abruptly current change, we need to adapt average values faster
+                                if (maxCurrent - minCurrent >= 3) {
+                                currentArray.splice(0,7);
+                                }
+
+                                // create current Array for smooth out charge state estimation
+                                currentArray.push(current);
+                                if ( currentArray.length > 10 ) {
+                                    currentArray.shift();
+                                }
+                                const currentSum = currentArray.reduce((a, b) => a + b, 0);
+                                const currentAvg = (currentSum / currentArray.length).toFixed(2) || 0;
+
+                                let state = '-';
+                                if(current > 0) {
+                                    state = fmt.format(Math.abs((capacity - chargeLevel) / currentAvg).toFixed(2)) + " hours till charged";
+                                } else if(current < 0) {
+                                    state = fmt.format(Math.abs(chargeLevel / currentAvg).toFixed(2)) + " hours till depleted";
+                                }
+
+                                $vf.value = volt + ' / ' + currentAvg;
+                                // $cf.value = currentAvg;
+                                let chargePercent = (chargeLevel / capacity) * 100;
+                                let capacityWatthours = chargePercent*nominalVoltage
+
+                                $lf.value = fmt.format(chargePercent) + "% (" + chargeLevel + "/" + capacity + ")";
+                                $sf.value = state;
+                                $wf.value = fmt.format((currentAvg * volt).toFixed(2));
+
+                                elem.style.width = fmt.format(chargePercent) + "%";
+                                elem.innerHTML = fmt.format(chargePercent) + "% (" + capacityWatthours.toFixed(0) + " Wh)";
+
+                                // create a timestamp, update on every new poll to store the last infos
+                                // let timestamp = Date.now();
+                                let timestamp = new Date;
+
+                                // create uID to store only the last value per day
+                                uniqueTimeID = '' + timestamp.getFullYear() + (timestamp.getMonth()+1) + (timestamp.getDate()) + '';
+
+                                manipulateEntry = statisticsArray.filter(element => element.uniqueTimeID === uniqueTimeID);
+
+                                if ( manipulateEntry.length === 0 ) {
+                                    // create new item per day if nothing exist
+                                    statisticsArray.push({ uniqueTimeID: uniqueTimeID, time: timestamp, 
+                                        chargeLevel: fmt.format(chargePercent), 
+                                        volt: volt, 
+                                        currentAvg: currentAvg, 
+                                    });
+                                } else {
+                                    // manipulate the existing entry per day
+                                    manipulateEntry[0].time = timestamp;
+                                    manipulateEntry[0].chargeLevel = fmt.format(chargePercent);
+                                    manipulateEntry[0].volt = volt;
+                                    manipulateEntry[0].currentAvg = currentAvg;
+                                }
+
+                                // cut array after 30 days
+                                if ( statisticsArray.length > 30 ) {
+                                    statisticsArray.shift();
+                                }
+
+                                localStorage.setItem('statisticsArray', JSON.stringify(statisticsArray));
+
+                                var strList = '<ul class="list-group">'
+                                strList += '<li class="list-group-item active"> On phone stored statistics (max.30 days)</li>';
+
+                                statisticsArray.forEach(function(element) {
+                                    strList += '<li class="list-group-item"><span class="timestamp">'+ getTimestamp (element.time) + '</span><br>' + element.chargeLevel + '% (' + element.volt + 'V / ' + element.currentAvg + 'A)</li>';
+                                }); 
+
+                                strList += '</ul>';
+                                document.getElementById("listContainer").innerHTML = strList;
+
+                                // console.log('chargeLevel', chargeLevel);
+                                // console.log('capacity', capacity);
+                            } else if(requestType === 'getCellVolts') {
+                                let numCells = payload.getUint16(0);
+                                let volts = [];
+                                for(let x=1; x <= numCells; x++) {
+                                    let volt = payload.getUint16(x*2) / 10;
+                                    volts.push(volt);
+                                }
+                                $cvf.value = volts.join(', ');
+                            }
+                        } catch (error) {
+                            console.error(error);
+                        }
+
+                        requestType = '';
+                    });
+
+                    let requestReady = async function() {
+                        while(true) {
+                            if(requestType === '') {
+                                break;
+                            }
+                            await timeout(250);
+                        }
+                    };
+
+                    let getTemps = async function () {
+                        const buffer = new ArrayBuffer(8);
+                        const view = new DataView(buffer);
+                        view.setUint16(0, 0x3003);
+                        view.setUint16(2, 0x1399);
+                        view.setUint16(4, 0x0005);
+                        view.setUint16(6, 0x5543);
+
+                        requestType = 'getTemps';
+                        if(rxCharacteristic.writeValueWithResponse) {
+                            await rxCharacteristic.writeValueWithResponse(buffer);
+                        } else {
+                            await rxCharacteristic.writeValue(buffer);
+                        }
+                    };
+
+                    let getLevels = async function () {
+                        const buffer = new ArrayBuffer(8);
+                        const view = new DataView(buffer);
+                        view.setUint16(0, 0x3003);
+                        view.setUint16(2, 0x13B2);
+                        view.setUint16(4, 0x0006);
+                        view.setUint16(6, 0x654A);
+
+                        requestType = 'getLevels';
+                        if(rxCharacteristic.writeValueWithResponse) {
+                            await rxCharacteristic.writeValueWithResponse(buffer);
+                        } else {
+                            await rxCharacteristic.writeValue(buffer);
+                        }
+                    };
+
+                    let getCellVolts = async function () {
+                        const buffer = new ArrayBuffer(8);
+                        const view = new DataView(buffer);
+                        view.setUint16(0, 0x3003);
+                        view.setUint16(2, 0x1388);
+                        view.setUint16(4, 0x0011);
+                        view.setUint16(6, 0x0549);
+
+                        requestType = 'getCellVolts';
+                        if(rxCharacteristic.writeValueWithResponse) {
+                            await rxCharacteristic.writeValueWithResponse(buffer);
+                        } else {
+                            await rxCharacteristic.writeValue(buffer);
+                        }
+                    };
+
+                    $bcc.parentNode.removeChild($bcc);
+                    $msg.style.display = 'none';
+
                     while(true) {
-                        if(requestType === '') {
-                            break;
+                        try {
+                            // console.log('Starting battery read');
+                            await requestReady();
+                            await getTemps();
+                            await requestReady();
+                            await getLevels();
+                            await requestReady();
+                            await getCellVolts();
+                        } catch(err) {
+                            console.error(err);
+                            $msg.style.display = 'block';
+                            $msg.innerHTML = err;
                         }
-                        await timeout(250);
-                    }
-                };
 
-                let getTemps = async function () {
-                    const buffer = new ArrayBuffer(8);
-                    const view = new DataView(buffer);
-                    view.setUint16(0, 0x3003);
-                    view.setUint16(2, 0x1399);
-                    view.setUint16(4, 0x0005);
-                    view.setUint16(6, 0x5543);
-
-                    requestType = 'getTemps';
-                    if(rxCharacteristic.writeValueWithResponse) {
-                        await rxCharacteristic.writeValueWithResponse(buffer);
-                    } else {
-                        await rxCharacteristic.writeValue(buffer);
-                    }
-                };
-
-                let getLevels = async function () {
-                    const buffer = new ArrayBuffer(8);
-                    const view = new DataView(buffer);
-                    view.setUint16(0, 0x3003);
-                    view.setUint16(2, 0x13B2);
-                    view.setUint16(4, 0x0006);
-                    view.setUint16(6, 0x654A);
-
-                    requestType = 'getLevels';
-                    if(rxCharacteristic.writeValueWithResponse) {
-                        await rxCharacteristic.writeValueWithResponse(buffer);
-                    } else {
-                        await rxCharacteristic.writeValue(buffer);
-                    }
-                };
-
-                let getCellVolts = async function () {
-                    const buffer = new ArrayBuffer(8);
-                    const view = new DataView(buffer);
-                    view.setUint16(0, 0x3003);
-                    view.setUint16(2, 0x1388);
-                    view.setUint16(4, 0x0011);
-                    view.setUint16(6, 0x0549);
-
-                    requestType = 'getCellVolts';
-                    if(rxCharacteristic.writeValueWithResponse) {
-                        await rxCharacteristic.writeValueWithResponse(buffer);
-                    } else {
-                        await rxCharacteristic.writeValue(buffer);
-                    }
-                };
-
-                $bcc.parentNode.removeChild($bcc);
-                $msg.style.display = 'none';
-
-                while(true) {
-                    try {
-                        // console.log('Starting battery read');
-                        await requestReady();
-                        await getTemps();
-                        await requestReady();
-                        await getLevels();
-                        await requestReady();
-                        await getCellVolts();
-                    } catch(err) {
-                        console.error(err);
-                        $msg.style.display = 'block';
-                        $msg.innerHTML = err;
+                        await timeout(1000);
                     }
 
-                    await timeout(1000);
-                }
-
-            })().catch((err) => {
-                console.error(err);
-                $msg.style.display = 'block';
-                $msg.innerHTML = err;
-            });
-        };
-    </script>
-  </body>
+                })().catch((err) => {
+                    console.error(err);
+                    $msg.style.display = 'block';
+                    $msg.innerHTML = err;
+                });
+            };
+        </script>
+    </body>
 </html>
