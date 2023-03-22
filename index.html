@@ -121,6 +121,7 @@
                     let requestType = '';
                     txCharacteristic.addEventListener('characteristicvaluechanged', (event) => {
                         try {
+                            console.log('event', event);
                             const packet = event.target.value;
                             const payload = new DataView(packet.buffer, 3);
                             console.log('payload', payload);
